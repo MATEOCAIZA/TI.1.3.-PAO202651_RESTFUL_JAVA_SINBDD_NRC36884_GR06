@@ -1,19 +1,4 @@
-# Archivos de .NET
 .vs/
 obj/
 bin/
 packages/
-*.csproj.user
-
-# Compilados de Maven (Java / Jakarta EE)
-target/
-**/target/
-*.class
-*.war
-*.ear
-*.jar
-
-# Archivos temporales de IDEs
-.nb-attr
-*.log
-nb-configuration.xml
