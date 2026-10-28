@@ -7,6 +7,6 @@ public class LoginServicio {
         if (usuario == null || usuario.isEmpty()) return false;
         if (clave == null || clave.isEmpty()) return false;
 
-        return usuario.equals("monster") && clave.equals("monster9");
+        return usuario.equals("MONSTER") && clave.equals("MONSTER69");
     }
 }

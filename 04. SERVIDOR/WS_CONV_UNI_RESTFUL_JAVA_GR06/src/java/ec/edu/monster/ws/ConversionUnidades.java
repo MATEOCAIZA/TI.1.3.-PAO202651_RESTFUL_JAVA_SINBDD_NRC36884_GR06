@@ -1,11 +1,32 @@
 package ec.edu.monster.ws;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 @Path("conversion")
 public class ConversionUnidades {
+
+    // LONGITUD: factor a metros
+    private static final Map<String, Double> LONGITUD = new HashMap<>();
+    // PESO: factor a kilogramos
+    private static final Map<String, Double> PESO = new HashMap<>();
+
+    static {
+        LONGITUD.put("m", 1.0);
+        LONGITUD.put("cm", 0.01);
+        LONGITUD.put("km", 1000.0);
+        LONGITUD.put("in", 0.0254);
+        LONGITUD.put("ft", 0.3048);
+
+        PESO.put("kg", 1.0);
+        PESO.put("g", 0.001);
+        PESO.put("lb", 0.45359237);
+        PESO.put("oz", 0.028349523125);
+        PESO.put("t", 1000.0);
+    }
 
     @GET
     @Path("{valor}/{origen}/{destino}")
@@ -15,36 +36,38 @@ public class ConversionUnidades {
 
         double resultado = 0;
 
-        // LONGITUD
-        if (origen.equals("m") && destino.equals("cm")) resultado = valor * 100;
-        else if (origen.equals("cm") && destino.equals("m")) resultado = valor / 100;
-        else if (origen.equals("m") && destino.equals("km")) resultado = valor / 1000;
-        else if (origen.equals("km") && destino.equals("m")) resultado = valor * 1000;
-        else if (origen.equals("m") && destino.equals("in")) resultado = valor * 39.37;
-        else if (origen.equals("in") && destino.equals("m")) resultado = valor / 39.37;
-        else if (origen.equals("m") && destino.equals("ft")) resultado = valor * 3.28084;
-        else if (origen.equals("ft") && destino.equals("m")) resultado = valor / 3.28084;
-
-        // PESO
-        else if (origen.equals("kg") && destino.equals("g")) resultado = valor * 1000;
-        else if (origen.equals("g") && destino.equals("kg")) resultado = valor / 1000;
-        else if (origen.equals("kg") && destino.equals("lb")) resultado = valor * 2.20462;
-        else if (origen.equals("lb") && destino.equals("kg")) resultado = valor / 2.20462;
-        else if (origen.equals("kg") && destino.equals("oz")) resultado = valor * 35.274;
-        else if (origen.equals("oz") && destino.equals("kg")) resultado = valor / 35.274;
-        else if (origen.equals("kg") && destino.equals("t")) resultado = valor / 1000;
-        else if (origen.equals("t") && destino.equals("kg")) resultado = valor * 1000;
-
-        // TEMPERATURA
-        else if (origen.equals("C") && destino.equals("F")) resultado = (valor * 9/5) + 32;
-        else if (origen.equals("F") && destino.equals("C")) resultado = (valor - 32) * 5/9;
-        else if (origen.equals("C") && destino.equals("K")) resultado = valor + 273.15;
-        else if (origen.equals("K") && destino.equals("C")) resultado = valor - 273.15;
-        else if (origen.equals("C") && destino.equals("R")) resultado = (valor + 273.15) * 9/5;
-        else if (origen.equals("R") && destino.equals("C")) resultado = (valor - 491.67) * 5/9;
-
-        else if (origen.equals(destino)) resultado = valor;
+        if (origen.equals(destino)) resultado = valor;
+        // cualquier par de la misma magnitud pasa por la unidad base
+        else if (LONGITUD.containsKey(origen) && LONGITUD.containsKey(destino))
+            resultado = valor * LONGITUD.get(origen) / LONGITUD.get(destino);
+        else if (PESO.containsKey(origen) && PESO.containsKey(destino))
+            resultado = valor * PESO.get(origen) / PESO.get(destino);
+        // TEMPERATURA: se pasa por grados Celsius
+        else if (esTemperatura(origen) && esTemperatura(destino))
+            resultado = desdeCelsius(aCelsius(valor, origen), destino);
 
         return String.valueOf(resultado);
+    }
+
+    private static boolean esTemperatura(String u) {
+        return u.equals("C") || u.equals("F") || u.equals("K") || u.equals("R");
+    }
+
+    private static double aCelsius(double v, String u) {
+        switch (u) {
+            case "F": return (v - 32) * 5 / 9;
+            case "K": return v - 273.15;
+            case "R": return (v - 491.67) * 5 / 9;
+            default:  return v;
+        }
+    }
+
+    private static double desdeCelsius(double c, String u) {
+        switch (u) {
+            case "F": return c * 9 / 5 + 32;
+            case "K": return c + 273.15;
+            case "R": return (c + 273.15) * 9 / 5;
+            default:  return c;
+        }
     }
 }
