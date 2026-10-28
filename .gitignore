@@ -1,0 +1,18 @@
+# Archivos de .NET
+.vs/
+obj/
+bin/
+packages/
+
+# Compilados de Maven (Java / Jakarta EE)
+target/
+**/target/
+*.class
+*.war
+*.ear
+*.jar
+
+# Archivos de configuración local de NetBeans / Payara
+.nb-attr
+*.log
+nb-configuration.xml
