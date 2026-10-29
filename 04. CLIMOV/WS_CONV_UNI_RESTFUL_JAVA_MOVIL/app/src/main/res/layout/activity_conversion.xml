@@ -100,34 +100,43 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Tipo de conversión"
+                    android:text="Categoría"
                     android:textColor="@color/blue_text"
                     android:textStyle="bold" />
 
-                <RadioGroup
-                    android:id="@+id/rgTipo"
+                <Spinner
+                    android:id="@+id/spCategoria"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:orientation="vertical">
+                    android:layout_marginTop="6dp" />
 
-                    <RadioButton
-                        android:id="@+id/rbPulgadasACm"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Pulgadas → Centímetros"
-                        android:textColor="@color/blue_text"
-                        android:buttonTint="@color/monster_green"
-                        android:checked="true" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Unidad de origen"
+                    android:textColor="@color/blue_text"
+                    android:textStyle="bold" />
 
-                    <RadioButton
-                        android:id="@+id/rbCmAPulgadas"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Centímetros → Pulgadas"
-                        android:textColor="@color/blue_text"
-                        android:buttonTint="@color/monster_green" />
-                </RadioGroup>
+                <Spinner
+                    android:id="@+id/spOrigen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Unidad de destino"
+                    android:textColor="@color/blue_text"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spDestino"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnConvertir"

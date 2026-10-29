@@ -21,6 +21,7 @@ public class ConversionLogin extends javax.swing.JFrame {
 
     public ConversionLogin() {
         initComponents();
+        setTitle("RESTFUL JAVA - Login");
         this.loginControlador = new LoginControlador();
     }
 

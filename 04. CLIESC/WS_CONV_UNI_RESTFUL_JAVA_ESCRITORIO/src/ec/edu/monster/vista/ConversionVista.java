@@ -18,6 +18,7 @@ public class ConversionVista extends javax.swing.JFrame {
      */
     public ConversionVista() {
         initComponents();
+        setTitle("RESTFUL JAVA - Conversión de Unidades");
         this.conversionControlador = new ConversionControlador();
         cbCategoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "masa", "longitud", "temperatura" }));
     
