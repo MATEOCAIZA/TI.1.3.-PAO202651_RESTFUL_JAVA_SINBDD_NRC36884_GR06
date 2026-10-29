@@ -1,80 +1,287 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+    if (session == null || session.getAttribute("usuarioLogueado") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor de Unidades RESTful</title>
+    <title>Conversor de Unidades</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .card { background: #ffffff; width: 100%; max-width: 450px; padding: 35px 30px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2); }
-        .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; }
-        .card-header img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
-        .card-header h2 { font-size: 1.25rem; color: #0f172a; font-weight: 700; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; font-size: 0.875rem; font-weight: 600; color: #334155; margin-bottom: 6px; }
-        .form-group input, .form-group select { width: 100%; padding: 12px 14px; font-size: 0.95rem; border: 1.5px solid #cbd5e1; border-radius: 8px; outline: none; background-color: #ffffff; transition: all 0.2s; }
-        .form-group input:focus, .form-group select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
-        .btn-submit { width: 100%; background-color: #10b981; color: #ffffff; padding: 12px; font-size: 1rem; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: background 0.2s, transform 0.1s; margin-top: 10px; }
-        .btn-submit:hover { background-color: #059669; }
-        .btn-submit:active { transform: scale(0.98); }
-        .result-box { margin-top: 22px; padding: 16px; background-color: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 8px; text-align: center; }
-        .result-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #166534; font-weight: 700; margin-bottom: 4px; }
-        .result-value { font-size: 1.25rem; color: #15803d; font-weight: 800; word-break: break-all; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #d1d5db;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .main-card {
+            background: #ffffff;
+            width: 620px;
+            padding: 45px 50px;
+        }
+        .form-group {
+            margin-bottom: 22px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        
+        .select-categoria {
+            width: 100%;
+            padding: 7px 10px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #2c3e50;
+            background-color: #b0c4de;
+            border: 1px solid #7a8a9e;
+            outline: none;
+        }
+        
+        .input-valor {
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 0.95rem;
+            border: 1px solid #7f8c8d;
+            background-color: #ffffff;
+            outline: none;
+        }
+
+        .row-unidades {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .col-unidad {
+            flex: 1;
+        }
+        .select-unidad {
+            width: 100%;
+            padding: 7px 10px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #2c3e50;
+            background-color: #e6ecf2;
+            border: 1px solid #9aa7b5;
+            outline: none;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .btn-convert {
+            flex: 1;
+            background-color: #27ae60;
+            color: #ffffff;
+            padding: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-clear {
+            flex: 1;
+            background-color: #95a5a6;
+            color: #ffffff;
+            padding: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            display: block;
+        }
+
+        .result-container {
+            margin-top: 10px;
+        }
+        .result-label {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+        .result-value {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-top: 6px;
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="card-header">
-            <img src="images/monster.jpg" alt="Avatar Small">
-            <h2>Conversor de Unidades</h2>
-        </div>
+    <div class="main-card">
+        <form action="ConversionServlet" method="POST" id="formConversor">
+            <input type="hidden" name="tipoConversion" id="tipoConversionHidden" value="m_cm" />
 
-        <form action="ConversionServlet" method="POST">
+            <!-- Categoría -->
             <div class="form-group">
-                <label>Valor a convertir</label>
-                <input type="number" step="any" name="valor" value="${valor != null ? valor : ''}" placeholder="Ingrese un número" required />
-            </div>
-
-            <div class="form-group">
-                <label>Unidad Origen</label>
-                <select name="origen">
-                    <option value="m" ${origenSeleccionado == 'm' ? 'selected' : ''}>Metros (m)</option>
-                    <option value="cm" ${origenSeleccionado == 'cm' ? 'selected' : ''}>Centímetros (cm)</option>
-                    <option value="km" ${origenSeleccionado == 'km' ? 'selected' : ''}>Kilómetros (km)</option>
-                    <option value="in" ${origenSeleccionado == 'in' ? 'selected' : ''}>Pulgadas (in)</option>
-                    <option value="ft" ${origenSeleccionado == 'ft' ? 'selected' : ''}>Pies (ft)</option>
-                    <option value="kg" ${origenSeleccionado == 'kg' ? 'selected' : ''}>Kilogramos (kg)</option>
-                    <option value="g" ${origenSeleccionado == 'g' ? 'selected' : ''}>Gramos (g)</option>
+                <label>Categoría:</label>
+                <select id="categoriaSelect" class="select-categoria" onchange="actualizarUnidades()">
+                    <option value="longitud">longitud</option>
+                    <option value="temperatura">temperatura</option>
+                    <option value="masa">masa</option>
                 </select>
             </div>
 
+            <!-- Valor a Convertir -->
             <div class="form-group">
-                <label>Unidad Destino</label>
-                <select name="destino">
-                    <option value="m" ${destinoSeleccionado == 'm' ? 'selected' : ''}>Metros (m)</option>
-                    <option value="cm" ${destinoSeleccionado == 'cm' ? 'selected' : ''}>Centímetros (cm)</option>
-                    <option value="km" ${destinoSeleccionado == 'km' ? 'selected' : ''}>Kilómetros (km)</option>
-                    <option value="in" ${destinoSeleccionado == 'in' ? 'selected' : ''}>Pulgadas (in)</option>
-                    <option value="ft" ${destinoSeleccionado == 'ft' ? 'selected' : ''}>Pies (ft)</option>
-                    <option value="kg" ${destinoSeleccionado == 'kg' ? 'selected' : ''}>Kilogramos (kg)</option>
-                    <option value="g" ${destinoSeleccionado == 'g' ? 'selected' : ''}>Gramos (g)</option>
-                </select>
+                <label>Valor a Convertir:</label>
+                <input type="number" step="any" name="valor" class="input-valor" value="${valor != null ? valor : ''}" required />
             </div>
 
-            <button type="submit" class="btn-submit">Calcular Conversión</button>
+            <!-- Unidad Origen y Destino -->
+            <div class="row-unidades">
+                <div class="col-unidad">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Unidad Origen:</label>
+                        <select id="origenSelect" class="select-unidad" onchange="sincronizarTipo()">
+                        </select>
+                    </div>
+                </div>
+                <div class="col-unidad">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Unidad Destino:</label>
+                        <select id="destinoSelect" class="select-unidad" onchange="sincronizarTipo()">
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="btn-group">
+                <button type="submit" class="btn-convert">Convertir</button>
+                <a href="conversion.jsp" class="btn-clear">Limpiar</a>
+            </div>
         </form>
 
-        <% 
-            String resultado = (String) request.getAttribute("resultado");
-            if (resultado != null) {
-        %>
-            <div class="result-box">
-                <div class="result-title">Resultado obtenido</div>
+        <div class="result-container">
+            <div class="result-label">Resultado:</div>
+            <% 
+                String resultado = (String) request.getAttribute("resultado");
+                if (resultado != null) {
+            %>
                 <div class="result-value"><%= resultado %></div>
-            </div>
-        <% } %>
+            <% } %>
+        </div>
     </div>
+
+    <script>
+        const opcionesMap = {
+            longitud: {
+                origen: [
+                    {val: 'm', text: 'Metros (m)'},
+                    {val: 'cm', text: 'Centímetros (cm)'},
+                    {val: 'km', text: 'Kilómetros (km)'},
+                    {val: 'in', text: 'Pulgadas (in)'},
+                    {val: 'ft', text: 'Pies (ft)'}
+                ],
+                destino: [
+                    {val: 'cm', text: 'Centímetros (cm)'},
+                    {val: 'm', text: 'Metros (m)'},
+                    {val: 'km', text: 'Kilómetros (km)'},
+                    {val: 'in', text: 'Pulgadas (in)'},
+                    {val: 'ft', text: 'Pies (ft)'}
+                ]
+            },
+            temperatura: {
+                origen: [
+                    {val: 'C', text: 'Celsius (°C)'},
+                    {val: 'F', text: 'Fahrenheit (°F)'},
+                    {val: 'K', text: 'Kelvin (K)'},
+                    {val: 'R', text: 'Rankine (R)'}
+                ],
+                destino: [
+                    {val: 'F', text: 'Fahrenheit (°F)'},
+                    {val: 'C', text: 'Celsius (°C)'},
+                    {val: 'K', text: 'Kelvin (K)'},
+                    {val: 'R', text: 'Rankine (R)'}
+                ]
+            },
+            masa: {
+                origen: [
+                    {val: 'kg', text: 'Kilogramos (kg)'},
+                    {val: 'g', text: 'Gramos (g)'},
+                    {val: 'lb', text: 'Libras (lb)'},
+                    {val: 'oz', text: 'Onzas (oz)'},
+                    {val: 't', text: 'Toneladas (t)'}
+                ],
+                destino: [
+                    {val: 'lb', text: 'Libras (lb)'},
+                    {val: 'kg', text: 'Kilogramos (kg)'},
+                    {val: 'g', text: 'Gramos (g)'},
+                    {val: 'oz', text: 'Onzas (oz)'},
+                    {val: 't', text: 'Toneladas (t)'}
+                ]
+            }
+        };
+
+        function actualizarUnidades() {
+            const cat = document.getElementById('categoriaSelect').value;
+            const origenSelect = document.getElementById('origenSelect');
+            const destinoSelect = document.getElementById('destinoSelect');
+
+            origenSelect.innerHTML = '';
+            destinoSelect.innerHTML = '';
+
+            opcionesMap[cat].origen.forEach(op => {
+                origenSelect.add(new Option(op.text, op.val));
+            });
+            opcionesMap[cat].destino.forEach(op => {
+                destinoSelect.add(new Option(op.text, op.val));
+            });
+
+            sincronizarTipo();
+        }
+
+        function sincronizarTipo() {
+            const origen = document.getElementById('origenSelect').value;
+            const destino = document.getElementById('destinoSelect').value;
+            document.getElementById('tipoConversionHidden').value = origen + '_' + destino;
+        }
+
+        window.onload = function() {
+            actualizarUnidades();
+            
+            const prevTipo = "${tipoSeleccionado}";
+            
+            if (prevTipo && prevTipo.includes('_')) {
+                const partes = prevTipo.split('_');
+                const o = partes[0];
+                const d = partes[1];
+                
+                if (['m', 'cm', 'km', 'in', 'ft'].includes(o)) {
+                    document.getElementById('categoriaSelect').value = 'longitud';
+                } else if (['C', 'F', 'K', 'R'].includes(o)) {
+                    document.getElementById('categoriaSelect').value = 'temperatura';
+                } else if (['kg', 'g', 'lb', 'oz', 't'].includes(o)) {
+                    document.getElementById('categoriaSelect').value = 'masa';
+                }
+                
+                actualizarUnidades();
+                
+                document.getElementById('origenSelect').value = o;
+                document.getElementById('destinoSelect').value = d;
+                
+                sincronizarTipo();
+            }
+        };
+    </script>
 </body>
 </html>
